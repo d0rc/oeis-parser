@@ -21,7 +21,7 @@ A Python tool for fetching and storing data from the [Online Encyclopedia of Int
 
 1. Clone this repository:
    ```
-   git clone https://github.com/yourusername/oeis-parser.git
+   git clone https://github.com/d0rc/oeis-parser.git
    cd oeis-parser
    ```
 
