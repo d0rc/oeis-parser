@@ -40,7 +40,7 @@ The parser provides a command-line interface with several commands:
 python main.py fetch A000032
 ```
 
-This fetches the sequence A000032 (Lucas numbers) from OEIS and stores it in the database.
+This fetches the sequence A000032 (Lucas numbers) from OEIS and stores it in the database. If the sequence already exists in the database, it will not be re-fetched, and the existing data will be displayed instead.
 
 ### Fetch a range of sequences
 
@@ -48,7 +48,7 @@ This fetches the sequence A000032 (Lucas numbers) from OEIS and stores it in the
 python main.py fetch-range 1 100
 ```
 
-This fetches sequences A000001 through A000100 and stores them in the database.
+This fetches sequences A000001 through A000100 and stores them in the database. Sequences that are already in the database will be skipped to avoid unnecessary API calls.
 
 With the `--verbose` flag, it shows detailed progress information for each sequence as it's fetched:
 
@@ -62,6 +62,8 @@ This displays real-time information about each sequence as it's being fetched, i
 - Available implementations
 - Number of cross-references
 - Data size
+
+The parser will also show a summary of how many sequences were skipped because they were already in the database.
 
 ### Get a sequence from the database
 

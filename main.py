@@ -168,28 +168,46 @@ def main():
     
     try:
         if args.command == 'fetch':
-            # Fetch a single sequence
-            print(f"Fetching sequence {args.a_number}...")
-            sequence_data = parser.fetch_sequence(args.a_number)
-            db.insert_sequence(sequence_data)
-            print(f"Sequence {args.a_number} stored in database.")
-            
-            # Display sequence data
-            if args.format:
-                print("\nSequence data:")
-                print(format_sequence(sequence_data, args.format, args.verbose))
+            # Check if sequence already exists in database
+            existing_sequence = db.get_sequence(args.a_number)
+            if existing_sequence:
+                print(f"Sequence {args.a_number} already exists in database.")
+                
+                # Display sequence data
+                if args.format:
+                    print("\nSequence data:")
+                    print(format_sequence(existing_sequence, args.format, args.verbose))
+            else:
+                # Fetch the sequence
+                print(f"Fetching sequence {args.a_number}...")
+                sequence_data = parser.fetch_sequence(args.a_number)
+                db.insert_sequence(sequence_data)
+                print(f"Sequence {args.a_number} stored in database.")
+                
+                # Display sequence data
+                if args.format:
+                    print("\nSequence data:")
+                    print(format_sequence(sequence_data, args.format, args.verbose))
         
         elif args.command == 'fetch-range':
             # Fetch a range of sequences
             print(f"Fetching sequences {args.start} to {args.end}...")
             
-            # We'll modify the fetch_sequence_range method to fetch one by one
-            # so we can show progress
+            # We'll fetch one by one so we can show progress
             sequence_count = 0
             sequence_stats = []
+            skipped_count = 0
             
             for n in range(args.start, args.end + 1):
                 a_number = f"A{n:06d}"
+                
+                # Check if sequence already exists in database
+                existing_sequence = db.get_sequence(a_number)
+                if existing_sequence:
+                    print(f"Skipping {a_number} (already in database)")
+                    skipped_count += 1
+                    continue
+                
                 print(f"Fetching {a_number}...", end="", flush=True)
                 
                 try:
@@ -219,13 +237,14 @@ def main():
                         if sequence_data.get('implementations'):
                             print(f"  Implementations: {', '.join([impl['language'] for impl in sequence_data.get('implementations', [])])}")
                         print(f"  Cross references: {len(sequence_data.get('cross_references', []))}")
+                        print(f"  Description: {sequence_data['description']}")
                         print(f"  Data size: {len(json.dumps(sequence_data.get('data', {})))} bytes")
                         print()
                 
                 except Exception as e:
                     print(f" Error: {e}")
             
-            print(f"Fetched and stored {sequence_count} sequences.")
+            print(f"Fetched and stored {sequence_count} sequences. Skipped {skipped_count} sequences (already in database).")
         
         elif args.command == 'get':
             # Get sequence from database
